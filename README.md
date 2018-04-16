@@ -28,9 +28,9 @@ q0
 ```
 q4,q0
 ```
-`Transition function` indicates the transition function in the following format: currentState,input:destinationState. Example:
+`Transition function` indicates the transition function in the following format: currentState,input,pushOrpop,stackSymbol:destinationState. Example:
 ```
-q0,a:q2
+q0,a,1,x:q2
 ```
 This means that when being in 'q0' state and the next input is 'a' will take us to 'q3' state.
 

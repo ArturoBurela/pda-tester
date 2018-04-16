@@ -19,6 +19,8 @@ private:
   State* initialState;
   // Accepted paths
   std::vector<std::vector<link>> paths;
+  // PDA stack
+  std::stack<char> stack;
 
   // Returns state searching by name
   State* findState(std::string name) {

@@ -15,6 +15,8 @@ class State;
 // Struct to represents links
 struct link {
   char input;
+  char stackInput;
+  
   State* destination;
   link() = default;
   link(char i, State* d){
