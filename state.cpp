@@ -16,11 +16,14 @@ class State;
 struct link {
   char input;
   char stackInput;
-  
+  // True -> push / False -> pop
+  bool pushPop;
   State* destination;
   link() = default;
-  link(char i, State* d){
+  link(char i, char si, bool p, State* d){
     input = i;
+    stackInput = si;
+    pushPop = p;
     destination = d;
   }
 };
@@ -85,10 +88,10 @@ public:
       // Check if state is final
       if (end.test(0)) {
         // Return a link with '\n' if accepted
-        x.push_back(link('\n', this));
+        x.push_back(link('\n', '\n', false, this));
       } else {
         // Else return '\0'
-        x.push_back(link('\0', this));
+        x.push_back(link('\n', '\n', false, this));
       }
       paths.push_back(x);
       return paths;
@@ -118,7 +121,7 @@ public:
     }
     // If no valid paths were found append no valid path
     if (!valid.test(0)) {
-      x.push_back(link('\0', NULL));
+      x.push_back(link('\0', '\0', false, NULL));
       paths.push_back(x);
     }
     return paths;
