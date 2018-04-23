@@ -15,15 +15,14 @@ class State;
 // Struct to represents links
 struct link {
   char input;
+  char stackCondition;
   char stackInput;
-  // True -> push / False -> pop
-  bool pushPop;
   State* destination;
   link() = default;
-  link(char i, char si, bool p, State* d){
+  link(char i, char sc, char si, State* d){
     input = i;
+    stackCondition = sc;
     stackInput = si;
-    pushPop = p;
     destination = d;
   }
 };
