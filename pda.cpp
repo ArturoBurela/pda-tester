@@ -8,6 +8,7 @@ Arturo Burela
 #include <fstream>
 #include <sstream>
 #include <queue>
+#include <stack>
 
 class PDA {
 private:
@@ -19,8 +20,6 @@ private:
   State* initialState;
   // Accepted paths
   std::vector<std::vector<link>> paths;
-  // PDA stack
-  std::stack<char> stack;
 
   // Returns state searching by name
   State* findState(std::string name) {
@@ -43,7 +42,7 @@ private:
       if (it->at(0).input != '\0') {
         valid.set();
         // Push current state to received path
-        it->push_back(link('\0', initialState));
+        it->push_back(link('\0', '\0', false, initialState));
         // Remove first item as it is finalState self pointer
         it->erase(it->begin());
       }
@@ -138,7 +137,7 @@ private:
             }
           }
           // Find both states by name and add link
-          this->findState(name)->addLink(link(input, this->findState(destination)));
+          this->findState(name)->addLink(link(input, '\n', false, this->findState(destination)));
           break;
         }
       }

@@ -91,7 +91,7 @@ public:
         x.push_back(link('\n', '\n', false, this));
       } else {
         // Else return '\0'
-        x.push_back(link('\n', '\n', false, this));
+        x.push_back(link('\0', '\0', false, this));
       }
       paths.push_back(x);
       return paths;
