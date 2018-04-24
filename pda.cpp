@@ -23,6 +23,8 @@ private:
   std::vector<State> states;
   // The string to test
   std::queue<char> string;
+  // Stack alphabet
+  std::vector<char> alphabet;
   // Accepted paths
   std::vector<std::vector<link>> paths;
 
@@ -100,33 +102,59 @@ private:
         // Process data according to line number
         switch (i) {
           case 0:
-          std::cout << "Loading Non Terminal Symbols" << '\n';
+          // std::cout << "Loading Non Terminal Symbols" << '\n';
+          // std::cout << value << '\n';
           nts.push_back(value);
           break;
           case 1:
-          std::cout << "Loading alphabet" << '\n';
-          // Reading alphabet here is not really necessary
+          // std::cout << "Loading alphabet" << '\n';
+          alphabet.push_back(value.at(0));
+          // std::cout << value.at(0) << '\n';
           break;
           case 2:
-          std::cout << "Loading initial symbol" << '\n';
+          // std::cout << "Loading initial symbol" << '\n';
           initial = &(*std::find(nts.begin(), nts.end(), value));
+          // std::cout << *initial << '\n';
           break;
           default:
           std::cout << value << '\n';
           std::cout << "Loading transition function" << '\n';
           destination = "";
-          /*for ( std::string::iterator it=value.begin(); it!=value.end(); ++it){
-            // Save state name, input or final state according to ',' and ':'
-            if (*it == ',') {
-              name = destination;
-              destination = "";
-            } else if (*it == ':') {
-              input = destination.at(0);
-              destination = "";
-            } else {
-              destination += *it;
+          // Aux
+          std::bitset<2> found;
+          // stores nts
+          std::string nts;
+          // array to store each rule
+          std::string v;
+          for ( std::string::iterator it=value.begin(); it!=value.end(); ++it){
+            //Insert to nts until we found ->, then insert to v
+            if (!found.test(0)) {
+              nts.insert (nts.end(),*it);
+              // If -> is found set the
+              if (*(it-1)=='-' && *it=='>') {
+                found.set(0,1);
+                //Remove arrow from nts
+                nts.erase(nts.end()-1);
+                nts.erase(nts.end()-1);
+              }
+              continue;
             }
-          }*/
+            // If | found cut and start over
+            if (*it=='|') {
+              std::cout << "Pipe found" << '\n';
+              // Create new links and states
+              for (size_t i = 0; i < v.size(); i++) {
+                State x;
+                loop.addLink(link());
+                states.push_back(x);
+              }
+              //Reset v string
+              v.clear();
+              continue;
+            }
+            v.insert (v.end(),*it);
+          }
+          std::cout << "NTS: " << nts << '\n';
           // Find both states by name and add link
           //this->findState(name)->addLink(link(input, '\n', false, this->findState(destination)));
           break;
