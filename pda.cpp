@@ -8,7 +8,6 @@ Arturo Burela
 #include <fstream>
 #include <sstream>
 #include <queue>
-#include <stack>
 #include <algorithm>
 #include <list>
 
@@ -34,16 +33,16 @@ private:
   int stateNum = 0;
 
   // Start test
-  /*void test() {
+  void test() {
     std::bitset<1> valid;
     // Call to explore to get paths
-    paths = initialState->explore(string);
+    paths = start.explore(string);
     for (std::vector<std::vector<link>>::iterator it = paths.begin(); it != paths.end(); ++it){
       // If path is accepted
       if (it->at(0).input != '\0') {
         valid.set();
         // Push current state to received path
-        it->push_back(link('\0', '\0', false, initialState));
+        it->push_back(link('\0', '\0', false, &start));
         // Remove first item as it is finalState self pointer
         it->erase(it->begin());
       }
@@ -56,7 +55,7 @@ private:
       // If no path was found then just print and exit
       std::cout << " String not accepted by automaton " << '\n';
     }
-  }*/
+  }
 
   // Logs all automaton data
   void logStates() {
@@ -136,7 +135,7 @@ private:
               }
               //Reverse string to use rightmost
               std::reverse(v.begin(), v.end());
-              std::cout << v << '\n';
+              // std::cout << v << '\n';
               // Create new links and states
               for ( std::string::iterator itv=v.begin(); itv!=v.end(); ++itv){
                 //std::cout << *itv << '\n';
@@ -152,6 +151,7 @@ private:
                   fs->addLink(link('&',nts,*itv,ns));
                   // Set pointer
                   fs = ns;
+                  // If not last
                 } else if (itv!=v.end()-1) {
                   // Add new state and push to vector
                   states.push_back(State(std::to_string(stateNum)));
@@ -205,7 +205,7 @@ public:
     //Logs pda data
     logStates();
     //Test string
-    //test();
+    test();
   }
 };
 

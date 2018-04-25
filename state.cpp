@@ -9,6 +9,7 @@ Arturo Burela
 #include <vector>
 #include <iostream>
 #include <queue>
+#include <stack>
 
 class State;
 
