@@ -10,23 +10,28 @@ Arturo Burela
 #include <queue>
 #include <stack>
 #include <algorithm>
+#include <list>
 
 class PDA {
 private:
   // Stores all Non-terminal symbols
-  std::vector<std::string> nts;
+  std::vector<char> nts;
   // Pointer to initial non-terminal
-  std::string * initial;
+  char * initial;
   // Initial, loop and accept state
   State start, loop, accept;
   // Rest of states
-  std::vector<State> states;
+  std::list<State> states;
   // The string to test
   std::queue<char> string;
   // Stack alphabet
   std::vector<char> alphabet;
+  //PDA stack
+  std::stack<char> stack;
   // Accepted paths
   std::vector<std::vector<link>> paths;
+  // Aux counter to identify generated states
+  int stateNum = 0;
 
   // Start test
   /*void test() {
@@ -58,6 +63,9 @@ private:
     start.logData();
     loop.logData();
     accept.logData();
+    for (std::list<State>::iterator it = states.begin(); it != states.end(); ++it){
+      it->logData();
+    }
   }
 
   //Logs all paths
@@ -75,10 +83,6 @@ private:
   // Loads automaton data assuming file is formatted correctly
   void loadFile(const std::string& filename){
     std::cout << "Loading automaton..." << std::endl;
-    // Aux varaibles to store links
-    std::string name;
-    //char input;
-    std::string destination;
     std::ifstream afile(filename);
     // Stores a line
     std::string line;
@@ -87,15 +91,11 @@ private:
     // Line number counter
     int i = 0;
     // Get line data
-    std::cout << "Entrando al while" << '\n';
     while(getline(afile,line))
     {
       std::stringstream   linestream(line);
       // Stores split line value
       std::string value;
-      if (i == 4) {
-        //param = '\n';
-      }
       // Call again with param to read by characters
       while(getline(linestream,value,param))
       {
@@ -103,60 +103,73 @@ private:
         switch (i) {
           case 0:
           // std::cout << "Loading Non Terminal Symbols" << '\n';
-          // std::cout << value << '\n';
-          nts.push_back(value);
+          nts.push_back(value.at(0));
           break;
           case 1:
           // std::cout << "Loading alphabet" << '\n';
-          alphabet.push_back(value.at(0));
-          // std::cout << value.at(0) << '\n';
+          for (size_t i = 0; i < value.size(); i++) {
+            //Add to alphabet
+            alphabet.push_back(value.at(i));
+            // Create links to pop terminals in stack
+            loop.addLink(link(value.at(i),value.at(i),'&',&loop));
+          }
           break;
           case 2:
           // std::cout << "Loading initial symbol" << '\n';
-          initial = &(*std::find(nts.begin(), nts.end(), value));
-          // std::cout << *initial << '\n';
+          initial = &(*std::find(nts.begin(), nts.end(), value.at(0)));
           break;
           default:
-          std::cout << value << '\n';
-          std::cout << "Loading transition function" << '\n';
-          destination = "";
-          // Aux
-          std::bitset<2> found;
+          //std::cout << "Loading transition function" << '\n';
           // stores nts
-          std::string nts;
+          char nts = *value.begin();
           // array to store each rule
           std::string v;
-          for ( std::string::iterator it=value.begin(); it!=value.end(); ++it){
-            //Insert to nts until we found ->, then insert to v
-            if (!found.test(0)) {
-              nts.insert (nts.end(),*it);
-              // If -> is found set the
-              if (*(it-1)=='-' && *it=='>') {
-                found.set(0,1);
-                //Remove arrow from nts
-                nts.erase(nts.end()-1);
-                nts.erase(nts.end()-1);
+          // Aux pointer to states
+          State *fs, *ns;
+          fs = &loop;
+          for ( std::string::iterator it=(value.begin()+3); it!=value.end(); ++it){
+            v.insert(v.end(),*it);
+            // If | found or end of string make link and continue
+            if (*it=='|' || it==value.end()-1) {
+              if (*it=='|') {
+                v.pop_back();
               }
-              continue;
-            }
-            // If | found cut and start over
-            if (*it=='|') {
-              std::cout << "Pipe found" << '\n';
+              //Reverse string to use rightmost
+              std::reverse(v.begin(), v.end());
+              std::cout << v << '\n';
               // Create new links and states
-              for (size_t i = 0; i < v.size(); i++) {
-                State x;
-                loop.addLink(link());
-                states.push_back(x);
+              for ( std::string::iterator itv=v.begin(); itv!=v.end(); ++itv){
+                //std::cout << *itv << '\n';
+                // If only one
+                if (itv==v.begin() && itv==v.end()-1) {
+                  loop.addLink(link('&',nts,*itv,&loop));
+                  // If first
+                } else if (itv==v.begin()) {
+                  // Add new state and push to vector
+                  states.push_back(State(std::to_string(stateNum)));
+                  stateNum++;
+                  ns = &states.back();
+                  fs->addLink(link('&',nts,*itv,ns));
+                  // Set pointer
+                  fs = ns;
+                } else if (itv!=v.end()-1) {
+                  // Add new state and push to vector
+                  states.push_back(State(std::to_string(stateNum)));
+                  stateNum++;
+                  ns = &states.back();
+                  fs->addLink(link('&','&',*itv,ns));
+                  // Set pointer
+                  fs = ns;
+                } else {
+                  // If last
+                  fs->addLink(link('&','&',*itv,&loop));
+                  fs = &loop;
+                }
               }
               //Reset v string
               v.clear();
-              continue;
             }
-            v.insert (v.end(),*it);
           }
-          std::cout << "NTS: " << nts << '\n';
-          // Find both states by name and add link
-          //this->findState(name)->addLink(link(input, '\n', false, this->findState(destination)));
           break;
         }
       }
@@ -183,6 +196,14 @@ public:
     accept = State("Accept");
     //Load automaton
     loadFile(filename);
+    //Push $ symbol to stack
+    stack.push('$');
+    //Link form start to loop
+    start.addLink(link('&','&',*initial,&loop));
+    //Link from loop to end
+    loop.addLink(link('&','$','&',&accept));
+    //Logs pda data
+    logStates();
     //Test string
     //test();
   }

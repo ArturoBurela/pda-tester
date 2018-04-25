@@ -132,8 +132,11 @@ public:
     std::cout << "Final state: " << end[0] << '\n';
     std::cout << "Destinantions: " << '\n';
     for (std::vector<link>::iterator it = destinations.begin(); it != destinations.end(); ++it){
-      std::cout << "Input: " << it->input << '\n';
-      std::cout << "Destination: " << it->destination->getName() << '\n';
+      std::cout << "  Input: " << it->input << '\n';
+      std::cout << "  stackCondition: " << it->stackCondition << '\n';
+      std::cout << "  stackInput: " << it->stackInput << '\n';
+      std::cout << "  Destination: " << it->destination->getName() << '\n';
+      std::cout << "/* ------------------- */" << '\n';
     }
   }
 };
