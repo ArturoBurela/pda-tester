@@ -205,7 +205,7 @@ public:
     //Link from loop to end
     loop.addLink(link('&','$','&',&accept));
     //Logs pda data
-    logStates();
+    //logStates();
     //Test string
     test();
   }

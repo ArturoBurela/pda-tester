@@ -73,10 +73,8 @@ public:
 
   // Recursive function returns valid paths by testing string
   std::vector<std::vector<link>> explore(std::queue<char> string, std::stack<char> stack) {
-    std::cout << '\n';
-    std::cout << "CALLED IN STATE: " << name << '\n';
-    logString(string);
-    logStack(stack);
+    // logString(string);
+    // logStack(stack);
     // New paths to return
     std::vector<std::vector<link>> paths;
     std::vector<link> x;
@@ -178,7 +176,6 @@ public:
     if (string.empty()) {
       // Check if state is final
       if (end.test(0)) {
-        std::cout << "AQUÍ FUE ACEPTADO!..............................................................." << '\n';
         // Return a link with '\n' if accepted
         x.push_back(link('\n', '\n', false, this));
       } else {
