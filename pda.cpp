@@ -36,7 +36,7 @@ private:
   void test() {
     std::bitset<1> valid;
     // Call to explore to get paths
-    paths = start.explore(string);
+    paths = start.explore(string, stack);
     for (std::vector<std::vector<link>>::iterator it = paths.begin(); it != paths.end(); ++it){
       // If path is accepted
       if (it->at(0).input != '\0') {
@@ -55,6 +55,7 @@ private:
       // If no path was found then just print and exit
       std::cout << " String not accepted by automaton " << '\n';
     }
+    //logPaths(paths);
   }
 
   // Logs all automaton data
@@ -194,6 +195,7 @@ public:
     start = State("Start");
     loop = State("Loop");
     accept = State("Accept");
+    accept.setFinal();
     //Load automaton
     loadFile(filename);
     //Push $ symbol to stack
